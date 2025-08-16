@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: akilli_ilac_backend
+    environment:
+      DJANGO_DEBUG: "False"
+      DJANGO_DB_PATH: "/app/db/db.sqlite3"
+      SECRET_KEY: "degistir-bunu-cok-gizli"
+      ALLOWED_HOSTS: "*"
+    volumes:
+      - django_db:/app/db           # <- SQLite burada kalıcı
+      - media_data:/app/media       # (opsiyonel) medya dosyaları
+      - static_data:/app/staticfiles
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: akilli_ilac_frontend
+    environment:
+      - REACT_APP_API_BASE=/api
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  django_db:
+  media_data:
+  static_data:
